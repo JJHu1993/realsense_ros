@@ -1,4 +1,5 @@
-# realsense ROS package supporting all realsense camera types and Multiple cameras
+# realsense ROS package
+## support all realsense camera types and Multiple cameras
 
 ### command line format:
 roslaunch realsense_ros realsense_ros.launch sNum1:=xxx [sNum2:=xxx]
