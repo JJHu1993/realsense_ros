@@ -1,3 +1,6 @@
-# realsenseForRos
-It is for all realsense cameras that you want to open on the ROS ,and you can open mutiple cameras at the same time using serial numbers.
-What is going on?
+#realsense ROS package supporting all realsense camera types and Multiple cameras
+
+###command line format:
+roslaunch realsense_ros realsense_ros.launch sNum1:=xxx [sNum2:=xxx]
+
+xxx should be the serial number of realsense camera you want to use

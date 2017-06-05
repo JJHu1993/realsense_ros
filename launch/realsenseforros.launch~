@@ -1,0 +1,6 @@
+<launch>
+  <arg name="sNum1" default="" />
+  <arg name="sNum2" default="" />
+  <node pkg="realsenseForRos" name="realsense_ros" type="realsenseforros" output="screen" args="$(arg sNum1) $(arg sNum2)"/>
+  
+</launch>
