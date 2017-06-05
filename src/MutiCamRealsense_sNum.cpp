@@ -68,8 +68,8 @@ int main(int argc,char** argv) try
     ros::Rate loop_rate(30);
 
     // Turn on logging. We can separately enable logging to console or to file, and use different severity filters for each.
-    //rs::log_to_console(rs::log_severity::warn);
-    //rs::log_to_file(rs::log_severity::debug, "librealsense.log");
+    ////rs::log_to_console(rs::log_severity::warn);
+    ////rs::log_to_file(rs::log_severity::debug, "librealsense.log");
     
     // Create a context object. This object owns the handles to all connected realsense devices.
     rs::context ctx;
