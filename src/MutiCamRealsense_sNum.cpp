@@ -92,6 +92,7 @@ int main(int argc,char** argv) try
 		}
 		ROS_ERROR("\n  ERROR! Plese input the Serial Number as a argument of the device you want to open!\n");
         ROS_ERROR("\n  Command format: roslaunch realsense_ros realsense_ros.launch sNum1:=xxx\n");
+
 		return EXIT_FAILURE;
 	}
     
