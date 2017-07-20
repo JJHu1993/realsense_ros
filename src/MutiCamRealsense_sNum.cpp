@@ -64,6 +64,7 @@ int main(int argc,char** argv) try
     image_transport::ImageTransport it (node_handle);
     std::vector<image_transport::Publisher> pubRgb;
 	std::vector<image_transport::Publisher> pubIr;
+    std::vector<image_transport::Publisher> pubDepth;
     std::vector<ros::Publisher> realsense_pointWiColor;
     ros::Rate loop_rate(30);
 
@@ -118,6 +119,8 @@ int main(int argc,char** argv) try
 											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
 		pubIr.push_back(it.advertise("camera/image/ir_raw_"+
 											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+        pubDepth.push_back(it.advertise("camera/image/depth_"+
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
 		dev[use_device_count]->enable_stream(rs::stream::depth, rs::preset::best_quality);
 		dev[use_device_count]->enable_stream(rs::stream::color, rs::preset::best_quality);
 		dev[use_device_count]->enable_stream(rs::stream::infrared, 640, 480, rs::format::y8, 60);
@@ -168,8 +171,19 @@ int main(int argc,char** argv) try
 			msgIr->step = 640 * sizeof (unsigned char) * 1;
 			pubIr[i].publish(msgIr);
 
-
-			
+			//publish depth image
+            cv::Mat cvImgDep = cv::Mat(480, 640, CV_16UC1, cv::Scalar (0));
+			cvImgDep.data = (uchar *)depth_image;
+			sensor_msgs::ImagePtr msgDep = cv_bridge::CvImage(std_msgs::Header(), sensor_msgs::image_encodings::TYPE_16UC1,cvImgDep).toImageMsg();
+			msgDep->header.frame_id = "camera_depth_optical_frame"+ boost::lexical_cast<std::string>(dev[i]->get_serial());
+			msgDep->header.stamp = stamp_; // Publish timestamp to synchronize frames.
+			msgDep->width = 640;
+			msgDep->height = 480;
+			msgDep->is_bigendian = false;
+			msgDep->step = 640 * sizeof (uint16_t) * 1;
+			pubDepth[i].publish(msgDep);
+            
+            
 			//publish color image for calibration
 			cv::Mat cvImg = cv::Mat(480, 640, CV_8UC3, cv::Scalar (0, 0, 0));
 			cvImg.data = (uchar *)color_image;
