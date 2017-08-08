@@ -65,6 +65,7 @@ int main(int argc,char** argv) try
     std::vector<image_transport::Publisher> pubRgb;
 	std::vector<image_transport::Publisher> pubIr;
     std::vector<image_transport::Publisher> pubDepth;
+    std::vector<image_transport::Publisher> pubRegisteredDepth;
     std::vector<ros::Publisher> realsense_pointWiColor;
     ros::Rate loop_rate(30);
 
@@ -121,6 +122,8 @@ int main(int argc,char** argv) try
 											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
         pubDepth.push_back(it.advertise("camera/image/depth_"+
 											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+        pubRegisteredDepth.push_back(it.advertise("camera/image/registered_depth__"+
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
 		dev[use_device_count]->enable_stream(rs::stream::depth, rs::preset::best_quality);
 		dev[use_device_count]->enable_stream(rs::stream::color, rs::preset::best_quality);
 		dev[use_device_count]->enable_stream(rs::stream::infrared, 640, 480, rs::format::y8, 60);
@@ -156,6 +159,7 @@ int main(int argc,char** argv) try
 			ros::Time stamp_ = ros::Time::now();
 			// Retrieve our images
 			const uint16_t * depth_image = (const uint16_t *)dev[i]->get_frame_data(rs::stream::depth);
+            const uint16_t * registered_depth_image = (const uint16_t *)dev[i]->get_frame_data(rs::stream::depth_aligned_to_color);
 			const uint8_t * color_image = (const uint8_t *)dev[i]->get_frame_data(rs::stream::color);
 			const uint8_t * ir_image = (const uint8_t *)dev[i]->get_frame_data(rs::stream::infrared);
 
@@ -182,6 +186,18 @@ int main(int argc,char** argv) try
 			msgDep->is_bigendian = false;
 			msgDep->step = 640 * sizeof (uint16_t) * 1;
 			pubDepth[i].publish(msgDep);
+            
+            //publish registered depth image
+            cv::Mat cvImgRegDep = cv::Mat(480, 640, CV_16UC1, cv::Scalar (0));
+			cvImgRegDep.data = (uchar *)registered_depth_image;
+			sensor_msgs::ImagePtr msgRegDep = cv_bridge::CvImage(std_msgs::Header(), sensor_msgs::image_encodings::TYPE_16UC1,cvImgRegDep).toImageMsg();
+			msgRegDep->header.frame_id = "camera_color_optical_frame"+ boost::lexical_cast<std::string>(dev[i]->get_serial());
+			msgRegDep->header.stamp = stamp_; // Publish timestamp to synchronize frames.
+			msgRegDep->width = 640;
+			msgRegDep->height = 480;
+			msgRegDep->is_bigendian = false;
+			msgRegDep->step = 640 * sizeof (uint16_t) * 1;
+			pubRegisteredDepth[i].publish(msgRegDep);
             
             
 			//publish color image for calibration
