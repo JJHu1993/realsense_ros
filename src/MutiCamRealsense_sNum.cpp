@@ -14,7 +14,7 @@
 #include "rosgraph_msgs/Log.h"
 #include <tf/transform_broadcaster.h>
 #include <iostream>
-#include "realsense_ros/camera_intrin.h"
+#include <realsense_ros/camera_intrin.h>
 
 #include <boost/thread/thread.hpp>
 
@@ -246,12 +246,15 @@ int main(int argc,char** argv) try
 			rs::intrinsics depth_intrin = dev[i]->get_stream_intrinsics(rs::stream::depth);
 			rs::extrinsics depth_to_color = dev[i]->get_extrinsics(rs::stream::depth, rs::stream::color);
 			rs::intrinsics color_intrin = dev[i]->get_stream_intrinsics(rs::stream::color);
+            float scale = dev[i]->get_depth_scale();
+            
 			//publish camera info
             realsense_ros::camera_intrin rgb_intrin;
             rgb_intrin.ppx = color_intrin.ppx;
             rgb_intrin.ppy = color_intrin.ppy;
             rgb_intrin.fx = color_intrin.fx;
             rgb_intrin.fy = color_intrin.fy;
+            rgb_intrin.dev_depth_scale = scale;
             for(int i=0;i<5;i++)
                 rgb_intrin.coeffs.push_back(color_intrin.coeffs[i]);
             camera_info_rgb_publisher[i].publish(rgb_intrin);
@@ -261,6 +264,7 @@ int main(int argc,char** argv) try
             dep_intrin.ppy = depth_intrin.ppy;
             dep_intrin.fx = depth_intrin.fx;
             dep_intrin.fy = depth_intrin.fy;
+            dep_intrin.dev_depth_scale = scale;
             for(int i=0;i<5;i++)
                 dep_intrin.coeffs.push_back(depth_intrin.coeffs[i]);
             camera_info_depth_publisher[i].publish(dep_intrin);
@@ -268,8 +272,8 @@ int main(int argc,char** argv) try
 			//for(int i=0;i<3;i++)
 			//std::cout<<color_intrin.width<<"  "<<color_intrin.height;
 			//std::cout<<std::endl;;
-			float scale = dev[i]->get_depth_scale();				
-			
+							
+
 			// Set up a perspective transform in a space that we can rotate by clicking and dragging the mouse
 			for(int dy=0; dy<depth_intrin.height; ++dy)
 			{

@@ -108,7 +108,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES realsneForRos
+#  LIBRARIES realsense_ros
  CATKIN_DEPENDS cv_bridge genmsg message_filters message_runtime roscpp rospy std_msgs tf 
 #  DEPENDS system_lib
 )
@@ -129,27 +129,27 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 
 ## Declare a C++ library
-# add_library(realsneForRos
-#   src/${PROJECT_NAME}/realsneForRos.cpp
+# add_library(realsense_ros
+#   src/${PROJECT_NAME}/realsense_ros.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(realsneForRos ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(realsense_ros ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(realsneForRos_node src/realsneForRos_node.cpp)
+add_executable(realsense_ros src/MutiCamRealsense_sNum.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(realsneForRos_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(realsense_ros ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(realsneForRos_node
+# target_link_libraries(realsense_ros_node
 #   ${catkin_LIBRARIES}
 # )
-add_executable(realsense_ros src/MutiCamRealsense_sNum.cpp)
+# add_executable(realsense_ros src/MutiCamRealsense_sNum.cpp)
 target_link_libraries(realsense_ros librealsense.so ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
 #############
 ## Install ##
@@ -166,7 +166,7 @@ target_link_libraries(realsense_ros librealsense.so ${OpenCV_LIBRARIES} ${catkin
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS realsneForRos realsneForRos_node
+# install(TARGETS realsense_ros realsense_ros_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -191,7 +191,7 @@ target_link_libraries(realsense_ros librealsense.so ${OpenCV_LIBRARIES} ${catkin
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_realsneForRos.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_realsense_ros.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
