@@ -14,6 +14,7 @@
 #include "rosgraph_msgs/Log.h"
 #include <tf/transform_broadcaster.h>
 #include <iostream>
+#include "realsense_ros/camera_intrin.h"
 
 #include <boost/thread/thread.hpp>
 
@@ -67,6 +68,8 @@ int main(int argc,char** argv) try
     std::vector<image_transport::Publisher> pubDepth;
     std::vector<image_transport::Publisher> pubRegisteredDepth;
     std::vector<ros::Publisher> realsense_pointWiColor;
+    std::vector<ros::Publisher> camera_info_rgb_publisher;
+    std::vector<ros::Publisher> camera_info_depth_publisher;
     ros::Rate loop_rate(30);
 
     // Turn on logging. We can separately enable logging to console or to file, and use different severity filters for each.
@@ -123,6 +126,10 @@ int main(int argc,char** argv) try
         pubDepth.push_back(it.advertise("camera/image/depth_"+
 											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
         pubRegisteredDepth.push_back(it.advertise("camera/image/registered_depth__"+
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+        camera_info_rgb_publisher.push_back(node_handle.advertise<realsense_ros::camera_intrin>("camera/camera_info/rgb_"+
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+        camera_info_depth_publisher.push_back(node_handle.advertise<realsense_ros::camera_intrin>("camera/camera_info/depth_"+
 											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
 		dev[use_device_count]->enable_stream(rs::stream::depth, rs::preset::best_quality);
 		dev[use_device_count]->enable_stream(rs::stream::color, rs::preset::best_quality);
@@ -239,8 +246,25 @@ int main(int argc,char** argv) try
 			rs::intrinsics depth_intrin = dev[i]->get_stream_intrinsics(rs::stream::depth);
 			rs::extrinsics depth_to_color = dev[i]->get_extrinsics(rs::stream::depth, rs::stream::color);
 			rs::intrinsics color_intrin = dev[i]->get_stream_intrinsics(rs::stream::color);
-			
-			
+			//publish camera info
+            realsense_ros::camera_intrin rgb_intrin;
+            rgb_intrin.ppx = color_intrin.ppx;
+            rgb_intrin.ppy = color_intrin.ppy;
+            rgb_intrin.fx = color_intrin.fx;
+            rgb_intrin.fy = color_intrin.fy;
+            for(int i=0;i<5;i++)
+                rgb_intrin.coeffs.push_back(color_intrin.coeffs[i]);
+            camera_info_rgb_publisher[i].publish(rgb_intrin);
+            
+            realsense_ros::camera_intrin dep_intrin;
+            dep_intrin.ppx = depth_intrin.ppx;
+            dep_intrin.ppy = depth_intrin.ppy;
+            dep_intrin.fx = depth_intrin.fx;
+            dep_intrin.fy = depth_intrin.fy;
+            for(int i=0;i<5;i++)
+                dep_intrin.coeffs.push_back(depth_intrin.coeffs[i]);
+            camera_info_depth_publisher[i].publish(dep_intrin);
+            
 			//for(int i=0;i<3;i++)
 			//std::cout<<color_intrin.width<<"  "<<color_intrin.height;
 			//std::cout<<std::endl;;
