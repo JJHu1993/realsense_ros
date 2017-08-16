@@ -118,19 +118,19 @@ int main(int argc,char** argv) try
 		realsense_pointWiColor.push_back( node_handle.advertise<sensor_msgs::PointCloud2>("/camera/depth_registered/points_"+
 											boost::lexical_cast<std::string>(dev[use_device_count]->get_name()).substr(16,16)+
 											"_"+
-											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1000));
 		pubRgb.push_back(it.advertise("camera/image/rgb_"+
-											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1000));
 		pubIr.push_back(it.advertise("camera/image/ir_raw_"+
-											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1000));
         pubDepth.push_back(it.advertise("camera/image/depth_"+
-											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1000));
         pubRegisteredDepth.push_back(it.advertise("camera/image/registered_depth__"+
-											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1000));
         camera_info_rgb_publisher.push_back(node_handle.advertise<realsense_ros::camera_intrin>("camera/camera_info/rgb_"+
-											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1000));
         camera_info_depth_publisher.push_back(node_handle.advertise<realsense_ros::camera_intrin>("camera/camera_info/depth_"+
-											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1));
+											boost::lexical_cast<std::string>(dev[use_device_count]->get_serial()), 1000));
 		dev[use_device_count]->enable_stream(rs::stream::depth, rs::preset::best_quality);
 		dev[use_device_count]->enable_stream(rs::stream::color, rs::preset::best_quality);
 		dev[use_device_count]->enable_stream(rs::stream::infrared, 640, 480, rs::format::y8, 60);
